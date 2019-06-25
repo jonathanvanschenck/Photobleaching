@@ -1,5 +1,5 @@
 # Photobleaching
-Collection of scripts which will measure flourescent photobleaching
+Collection of scripts which will measure fluorescent photobleaching
 
 What they do: "bleach.py" will bleach a sample for specified time (bleachTime), then let the sample recover in darkness (darkTime), before bleaching the sample again. The cycle continues a specified number of times (bleachNum).
 
