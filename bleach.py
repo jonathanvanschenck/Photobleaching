@@ -116,15 +116,13 @@ if __name__ == "__main__":
     #-----------------
     it = 50#ms
     bleachTime=30#sec
-    recoveryTime=100#sec
-    sampleNum = 20
+    darkTime=100#sec
+    bleachNum = 3
     lamStart = 540#nm
     #------------------
     # \Edit Here
     #------------------
-    onTime=4*it/1000#sec
-    offTime=(recoveryTime/sampleNum)-onTime#sec
-    
+   
     f = open('temp.log',"w")
     bb = beamBlock()
     bb.closeShutter()
@@ -146,15 +144,15 @@ if __name__ == "__main__":
     f.write(","+str(time.time()))
     time.sleep(bleachTime)
     #Recovery
-    for i in range(sampleNum):
+    for i in range(bleachNum-1):
         #Close Shutter
         f.write(","+str(time.time()))
         bb.closeShutter()
-        time.sleep(offTime)
+        time.sleep(darkTime)
         #Open Shutter
         bb.openShutter()
         f.write(","+str(time.time()))
-        time.sleep(onTime)
+        time.sleep(bleachTime)
     #Stop measurement
     f.write(","+str(time.time()))
     bb.closeShutter()
@@ -190,10 +188,8 @@ if __name__ == "__main__":
     f = open(file+".csv","w")
     f.write("Integration Time={:.0f} ms\n".format(it))
     f.write("Bleaching Time={:.0f} s\n".format(bleachTime))
-    f.write("Total Recovery Time={:.0f} s\n".format(recoveryTime))
-    f.write("Bright Time={:.3f} s\n".format(onTime))
-    f.write("Dark Time={:.3f} s\n".format(offTime))
-    f.write("Recovery Samples={:.0f}\n".format(sampleNum))
+    f.write("Dark Time={:.0f} s\n".format(darkTime))
+    f.write("Bleach Num={:.0f}\n".format(bleachNum))
     f.write("#Beam Block opening times\n")
     f.write(",".join(["{:.4f}".format(tt-t[0]) for tt in tbbO])+"\n")
     f.write("#Beam Block closing times\n")
