@@ -2,7 +2,7 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 import seabreeze.spectrometers as sb
-from multiprocessing import Process, Lock, Queue
+from multiprocessing import Process, Lock
 import serial
 import sys
 try:
@@ -14,7 +14,9 @@ class beamBlock:
         """
         Initialized hardware with a closed shutter
         """
-        self.ser = serial.Serial(comport,9600,parity=serial.PARITY_NONE,stopbits=serial.STOPBITS_ONE,bytesize=serial.EIGHTBITS)
+        self.ser = serial.Serial(comport,9600,timeout=1,parity=serial.PARITY_NONE,stopbits=serial.STOPBITS_ONE,bytesize=serial.EIGHTBITS)
+        self.ser.write('mode=0\r'.encode())
+        self.ser.read(20)
         if self.qopenShutter():
             self.toggleShutter()
         
@@ -106,14 +108,20 @@ def specPull(file="test.txt"):
 #%
 if __name__ == "__main__":
     try:
-        file = sys.argv[1]#"190621BleachingRedPig_ph10_001"
+        file = sys.argv[1]
     except IndexError:
         file = "temp"
-    
+    #-----------------
+    # Edit Here
+    #-----------------
     it = 50#ms
     bleachTime=30#sec
     recoveryTime=100#sec
     sampleNum = 20
+    lamStart = 540#nm
+    #------------------
+    # \Edit Here
+    #------------------
     onTime=4*it/1000#sec
     offTime=(recoveryTime/sampleNum)-onTime#sec
     
@@ -165,7 +173,7 @@ if __name__ == "__main__":
     ax = fig.add_subplot(111)
     for ii in range(len(tbbO)):
         mask = np.array([tt>tbbO[ii]+it/1000 and tt<tbbC[ii] for tt in t[1:]])
-        maskl = np.array([lam>540 for lam in spec[:,0]])
+        maskl = np.array([lam>lamStart for lam in spec[:,0]])
         plt.plot((t[1:]-t[0])[mask],np.sum(spec[maskl,1:][:,mask],axis=0)-np.sum(spec[maskl,1]),".")
 #    ax.set_ylim(bottom=0)
     ylim = ax.get_ylim()
